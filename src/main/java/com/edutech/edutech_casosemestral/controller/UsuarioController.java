@@ -3,6 +3,7 @@ package com.edutech.edutech_casosemestral.controller;
 import com.edutech.edutech_casosemestral.model.Usuario;
 import com.edutech.edutech_casosemestral.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,5 +33,12 @@ public class UsuarioController {
     @DeleteMapping("/{id}")
     public void eliminar(@PathVariable Long id) {
         service.eliminar(id);
+    }
+
+    @GetMapping("/rut/{rut}")
+    public ResponseEntity<Usuario> buscarPorRut(@PathVariable String rut) {
+        return service.buscarPorRut(rut)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
