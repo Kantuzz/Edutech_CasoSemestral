@@ -4,8 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Data
-public class Usuario {
+public abstract class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,4 +17,10 @@ public class Usuario {
 
     private String nombre;
     private String correo;
+
+    private String rol;
+
+
+    public void setId(Long id) {
+    }
 }
