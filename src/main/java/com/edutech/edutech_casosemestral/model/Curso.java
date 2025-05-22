@@ -31,11 +31,11 @@ public class Curso {
     )
     private List<Estudiante> estudiantes = new ArrayList<>();
 
-    // Relación Uno a Muchos: curso tiene múltiples contenidos
-    //@OneToMany(mappedBy = "curso", cascade = CascadeType.ALL, orphanRemoval = true)
-    //private List<Contenido> contenidos = new ArrayList<>();
+    //Relación Uno a Muchos: curso tiene múltiples contenidos
+    @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Contenido> contenidos = new ArrayList<>();
 
-    // Relación Uno a Muchos: curso incluye múltiples evaluaciones
-    //@OneToMany(mappedBy = "curso", cascade = CascadeType.ALL, orphanRemoval = true)
-    //private List<Evaluacion> evaluaciones = new ArrayList<>();
+    //Relación Uno a Muchos: curso incluye múltiples evaluaciones
+    @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Evaluacion> evaluaciones = new ArrayList<>();
 }

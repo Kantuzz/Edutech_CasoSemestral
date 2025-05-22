@@ -33,4 +33,10 @@ public class EstudianteController {
     public void eliminar(@PathVariable Long id) {
         service.eliminar(id);
     }
+
+    @PutMapping("/{id}/cursos")
+    public Estudiante asignarCursos(@PathVariable Long id, @RequestBody List<Long> cursoIds) {
+        return service.asignarCursos(id, cursoIds);
+    }
+
 }

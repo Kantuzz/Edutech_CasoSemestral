@@ -23,14 +23,18 @@ public class CursoService {
     }
 
     public Curso guardar(Curso curso) {
-        Long instructorId = curso.getInstructor().getId();
+        if (curso.getInstructor() == null || curso.getInstructor().getId() == null) {
+            throw new IllegalArgumentException("El campo instructor.id no puede ser null.");
+        }
 
-        Instructor instructor = instructorRepository.findById(instructorId)
-                .orElseThrow(() -> new RuntimeException("Instructor no encontrado con ID: " + instructorId));
+        Instructor instructor = instructorRepository.findById(curso.getInstructor().getId())
+                .orElseThrow(() -> new RuntimeException("Instructor no encontrado"));
 
         curso.setInstructor(instructor);
         return cursoRepository.save(curso);
     }
+
+
 
     public Curso actualizar(Long id, Curso curso) {
         curso.setId(id);
