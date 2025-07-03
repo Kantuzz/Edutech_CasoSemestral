@@ -2,6 +2,11 @@ package com.edutech.edutech_casosemestral.controller;
 
 import com.edutech.edutech_casosemestral.model.Curso;
 import com.edutech.edutech_casosemestral.service.CursoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,28 +14,57 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/cursos")
+@Tag(name = "Cursos", description = "Operaciones relacionadas con los cursos")
 public class CursoController {
 
     @Autowired
     private CursoService service;
+
+    @Operation(summary = "Listar todos los cursos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listado de cursos obtenido correctamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno al obtener cursos")
+    })
 
     @GetMapping
     public List<Curso> listar() {
         return service.listar();
     }
 
+    @Operation(summary = "Guardar un nuevo curso")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Curso guardado exitosamente"),
+            @ApiResponse(responseCode = "400", description = "Datos invalidos")
+    })
+
     @PostMapping
     public Curso guardar(@RequestBody Curso curso) {
         return service.guardar(curso);
     }
 
+    @Operation(summary = "Actualizar un curso existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Curso actualizado correctamente"),
+            @ApiResponse(responseCode = "404", description = "Curso no encontrado")
+    })
+
     @PutMapping("/{id}")
-    public Curso actualizar(@PathVariable Long id, @RequestBody Curso curso) {
+    public Curso actualizar(
+            @Parameter(description = "ID del curso a actualizar", required = true)
+            @PathVariable Long id, @RequestBody Curso curso) {
         return service.actualizar(id, curso);
     }
 
+    @Operation(summary = "Eliminar un curso por ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Curso eliminado correctamente"),
+            @ApiResponse(responseCode = "404", description = "Curso no encontrado")
+    })
+
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
+    public void eliminar(
+            @Parameter(description = "ID del curso a eliminar", required = true)
+            @PathVariable Long id) {
         service.eliminar(id);
     }
 }
