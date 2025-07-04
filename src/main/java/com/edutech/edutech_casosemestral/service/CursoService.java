@@ -44,4 +44,10 @@ public class CursoService {
     public void eliminar(Long id) {
         cursoRepository.deleteById(id);
     }
+
+    public Curso obtenerPorId(Long id) {
+        return cursoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Curso no encontrado con id: " + id));
+    }
+
 }

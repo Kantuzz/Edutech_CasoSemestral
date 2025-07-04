@@ -9,6 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.edutech.edutech_casosemestral.assembler.NotificacionModelAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import java.util.stream.Collectors;
+
 
 import java.util.List;
 
@@ -20,21 +26,36 @@ public class NotificacionController {
     @Autowired
     private NotificacionService notificacionService;
 
+    @Autowired
+    private NotificacionModelAssembler assembler;
+
+
     @Operation(summary = "Listar todas las notificaciones", description = "Devuelve una lista de todas las notificaciones registradas")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Listado obtenido exitosamente")
     })
-
     @GetMapping
-    public List<Notificacion> listar() {
-        return notificacionService.listar();
+    public CollectionModel<EntityModel<Notificacion>> listar() {
+        List<EntityModel<Notificacion>> notificaciones = notificacionService.listar().stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+        return CollectionModel.of(
+                notificaciones,
+                linkTo(methodOn(NotificacionController.class).listar()).withSelfRel()
+        );
     }
 
-    @Operation(summary = "Guardar nueva notificacion", description = "Crea una nueva notificacion")
+    @Operation(summary = "Obtener notificación por ID", description = "Devuelve una notificación específica por su ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Notificacion creada"),
-            @ApiResponse(responseCode = "400", description = "Datos invalidos")
+            @ApiResponse(responseCode = "200", description = "Notificación encontrada"),
+            @ApiResponse(responseCode = "404", description = "Notificación no encontrada")
     })
+    @GetMapping("/{id}")
+    public EntityModel<Notificacion> obtenerPorId(
+            @Parameter(description = "ID de la notificación a obtener") @PathVariable Long id) {
+        Notificacion notificacion = notificacionService.obtenerPorId(id);
+        return assembler.toModel(notificacion);
+    }
 
     @PostMapping
     public Notificacion guardar(@RequestBody Notificacion notificacion) {

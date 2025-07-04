@@ -29,4 +29,10 @@ public class ContenidoService {
     public void eliminar(Long id) {
         repository.deleteById(id);
     }
+
+    public Contenido obtenerPorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contenido no encontrado con id: " + id));
+    }
+
 }

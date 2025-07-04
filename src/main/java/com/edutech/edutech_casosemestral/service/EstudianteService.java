@@ -46,5 +46,10 @@ public class EstudianteService {
 
         return repository.save(estudiante);
     }
+    public Estudiante obtenerPorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado con id: " + id));
+    }
+
 
 }

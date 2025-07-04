@@ -29,4 +29,10 @@ public class PagoService {
     public void eliminar(Long id) {
         pagoRepository.deleteById(id);
     }
+
+    public Pago obtenerPorId(Long id) {
+        return pagoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pago no encontrado con id: " + id));
+    }
+
 }

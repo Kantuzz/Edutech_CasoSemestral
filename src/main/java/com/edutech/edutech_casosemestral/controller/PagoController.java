@@ -9,6 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.edutech.edutech_casosemestral.assembler.PagoModelAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import java.util.stream.Collectors;
+
 
 import java.util.List;
 
@@ -20,21 +26,37 @@ public class PagoController {
     @Autowired
     private PagoService pagoService;
 
-    @Operation(summary = "Listar todos los pagos", description = "Devuelve una lista de todos los pagos registrados")
+    @Autowired
+    private PagoModelAssembler assembler;
+
+
+    @Operation(summary = "Listar todos los pagos", description = "Devuelve una lista de todos los pagos registrados con enlaces HATEOAS")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Listado obtenido correctamente")
     })
-
     @GetMapping
-    public List<Pago> listar() {
-        return pagoService.listar();
+    public CollectionModel<EntityModel<Pago>> listar() {
+        List<EntityModel<Pago>> pagos = pagoService.listar().stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+        return CollectionModel.of(
+                pagos,
+                linkTo(methodOn(PagoController.class).listar()).withSelfRel()
+        );
     }
 
-    @Operation(summary = "Guardar un nuevo pago", description = "Crea y guarda un nuevo pago en el sistema")
+    @Operation(summary = "Obtener pago por ID", description = "Devuelve un pago por su ID con enlaces HATEOAS")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Pago creado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Datos del pago invalidos")
+            @ApiResponse(responseCode = "200", description = "Pago encontrado"),
+            @ApiResponse(responseCode = "404", description = "Pago no encontrado")
     })
+    @GetMapping("/{id}")
+    public EntityModel<Pago> obtenerPorId(
+            @Parameter(description = "ID del pago a obtener") @PathVariable Long id) {
+        Pago pago = pagoService.obtenerPorId(id);
+        return assembler.toModel(pago);
+    }
+
 
     @PostMapping
     public Pago guardar(@RequestBody Pago pago) {

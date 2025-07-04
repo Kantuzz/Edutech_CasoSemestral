@@ -29,4 +29,10 @@ public class SoporteService {
     public void eliminar(Long id) {
         repository.deleteById(id);
     }
+
+    public Soporte obtenerPorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Soporte no encontrado con id: " + id));
+    }
+
 }

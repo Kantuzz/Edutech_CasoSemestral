@@ -29,4 +29,10 @@ public class NotificacionService {
     public void eliminar(Long id) {
         notificacionRepository.deleteById(id);
     }
+
+    public Notificacion obtenerPorId(Long id) {
+        return notificacionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Notificación no encontrada con id: " + id));
+    }
+
 }

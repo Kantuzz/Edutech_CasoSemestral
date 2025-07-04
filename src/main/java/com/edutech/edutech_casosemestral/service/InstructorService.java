@@ -29,4 +29,10 @@ public class InstructorService {
     public void eliminar(Long id) {
         repository.deleteById(id);
     }
+
+    public Instructor obtenerPorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Instructor no encontrado con id: " + id));
+    }
+
 }

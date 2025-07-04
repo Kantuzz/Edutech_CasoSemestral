@@ -29,4 +29,10 @@ public class AdministradorService {
     public void eliminar(Long id) {
         repository.deleteById(id);
     }
+
+
+    public Administrador obtenerPorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Administrador no encontrado con id: " + id));
+    }
 }

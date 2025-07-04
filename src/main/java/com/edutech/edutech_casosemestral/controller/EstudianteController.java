@@ -9,6 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.edutech.edutech_casosemestral.assembler.EstudianteModelAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import java.util.stream.Collectors;
+
 
 import java.util.List;
 
@@ -20,22 +26,39 @@ public class EstudianteController {
     @Autowired
     private EstudianteService service;
 
+    @Autowired
+    private EstudianteModelAssembler assembler;
+
+
     @Operation(summary = "Listar todos los Estudiantes")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Listado obtenido correctamente"),
-            @ApiResponse(responseCode = "500", description = "Error interno al obetener Estudiantes")
+            @ApiResponse(responseCode = "500", description = "Error interno al obtener Estudiantes")
     })
     @GetMapping
-
-    public List<Estudiante> listar() {
-        return service.listar();
+    public CollectionModel<EntityModel<Estudiante>> listar() {
+        List<EntityModel<Estudiante>> estudiantes = service.listar().stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+        return CollectionModel.of(
+                estudiantes,
+                linkTo(methodOn(EstudianteController.class).listar()).withSelfRel()
+        );
     }
 
-    @Operation(summary = "Guardar un nuevo estudiante")
+    @Operation(summary = "Obtener estudiante por ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Estudiante guardado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Datos Invalidos")
+            @ApiResponse(responseCode = "200", description = "Estudiante encontrado"),
+            @ApiResponse(responseCode = "404", description = "Estudiante no encontrado")
     })
+    @GetMapping("/{id}")
+    public EntityModel<Estudiante> obtenerPorId(
+            @Parameter(description = "ID del estudiante a obtener", required = true)
+            @PathVariable Long id) {
+        Estudiante estudiante = service.obtenerPorId(id);
+        return assembler.toModel(estudiante);
+    }
+
 
     @PostMapping
     public Estudiante guardar(@RequestBody Estudiante estudiante) {

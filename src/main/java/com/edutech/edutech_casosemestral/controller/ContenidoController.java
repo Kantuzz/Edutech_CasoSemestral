@@ -8,6 +8,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.edutech.edutech_casosemestral.assembler.ContenidoModelAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import java.util.stream.Collectors;
 
 import java.util.List;
 
@@ -19,24 +24,35 @@ public class ContenidoController {
     @Autowired
     private ContenidoService service;
 
+    @Autowired
+    private ContenidoModelAssembler assembler;
+
     @Operation(summary = "Listar todos los contenidos", description = "Retorna una lista de todos los contenidos disponibles")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista retornada correctamente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-
     @GetMapping
-    public List<Contenido> listar() {
-        return service.listar();
+    public CollectionModel<EntityModel<Contenido>> listar() {
+        List<EntityModel<Contenido>> contenidos = service.listar().stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+        return CollectionModel.of(
+                contenidos,
+                linkTo(methodOn(ContenidoController.class).listar()).withSelfRel()
+        );
     }
 
-    @Operation(summary = "Guardar nuevo contenido", description = "Crea un nuevo contenido en la base de datos")
+    @Operation(summary = "Obtener contenido por ID", description = "Devuelve un contenido específico por su ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contenido creado correctamente"),
-            @ApiResponse(responseCode = "400", description = "Solicitud invalida"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+            @ApiResponse(responseCode = "200", description = "Contenido encontrado"),
+            @ApiResponse(responseCode = "404", description = "Contenido no encontrado")
     })
-
+    @GetMapping("/{id}")
+    public EntityModel<Contenido> obtenerPorId(@PathVariable Long id) {
+        Contenido contenido = service.obtenerPorId(id);
+        return assembler.toModel(contenido);
+    }
     @PostMapping
     public Contenido guardar(@RequestBody Contenido contenido) {
         return service.guardar(contenido);

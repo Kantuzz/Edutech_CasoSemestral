@@ -9,6 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.edutech.edutech_casosemestral.assembler.AdministradorModelAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import java.util.stream.Collectors;
+
 
 import java.util.List;
 
@@ -20,22 +26,38 @@ public class AdministradorController {
     @Autowired
     private AdministradorService service;
 
+    @Autowired
+    private AdministradorModelAssembler assembler;
+
+
     @Operation(summary = "Listar todos los administradores")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Listado obtenido correctamente"),
             @ApiResponse(responseCode = "500", description = "Error interno al obtener administradores")
     })
-
     @GetMapping
-    public List<Administrador> listar() {
-        return service.listar();
+    public CollectionModel<EntityModel<Administrador>> listar() {
+        List<EntityModel<Administrador>> administradores = service.listar().stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+        return CollectionModel.of(
+                administradores,
+                linkTo(methodOn(AdministradorController.class).listar()).withSelfRel()
+        );
     }
 
-    @Operation(summary = "Guardar un nuevo administrador")
+    @Operation(summary = "Obtener un administrador por ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Administrador guardado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Datos invalidos")
+            @ApiResponse(responseCode = "200", description = "Administrador encontrado"),
+            @ApiResponse(responseCode = "404", description = "Administrador no encontrado")
     })
+    @GetMapping("/{id}")
+    public EntityModel<Administrador> obtenerPorId(
+            @Parameter(description = "ID del administrador a obtener", required = true)
+            @PathVariable Long id) {
+        Administrador admin = service.obtenerPorId(id);
+        return assembler.toModel(admin);
+    }
 
     @PostMapping
     public Administrador guardar(@RequestBody Administrador admin) {

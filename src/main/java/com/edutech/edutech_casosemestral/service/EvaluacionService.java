@@ -37,4 +37,10 @@ public class EvaluacionService {
     public void eliminar(Long id) {
         evaluacionRepository.deleteById(id);
     }
+
+    public Evaluacion obtenerPorId(Long id) {
+        return evaluacionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Evaluacion no encontrada con id: " + id));
+    }
+
 }

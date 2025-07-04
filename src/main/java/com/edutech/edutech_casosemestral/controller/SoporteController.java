@@ -1,5 +1,6 @@
 package com.edutech.edutech_casosemestral.controller;
 
+import com.edutech.edutech_casosemestral.assembler.SoporteModelAssembler;
 import com.edutech.edutech_casosemestral.model.Soporte;
 import com.edutech.edutech_casosemestral.service.SoporteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +10,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import java.util.stream.Collectors;
 
 import java.util.List;
 
@@ -20,14 +25,34 @@ public class SoporteController {
     @Autowired
     private SoporteService service;
 
+    @Autowired
+    private SoporteModelAssembler assembler;
+
     @Operation(summary = "Listar todos los soportes", description = "Devuelve una lista de todos los soportes")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Listado obtenido correctamente")
     })
-
     @GetMapping
-    public List<Soporte> listar() {
-        return service.listar();
+    public CollectionModel<EntityModel<Soporte>> listar() {
+        List<EntityModel<Soporte>> soportes = service.listar().stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+        return CollectionModel.of(
+                soportes,
+                linkTo(methodOn(SoporteController.class).listar()).withSelfRel()
+        );
+    }
+
+    @Operation(summary = "Obtener soporte por ID", description = "Devuelve un soporte por su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Soporte encontrado"),
+            @ApiResponse(responseCode = "404", description = "Soporte no encontrado")
+    })
+    @GetMapping("/{id}")
+    public EntityModel<Soporte> obtenerPorId(
+            @Parameter(description = "ID del soporte a obtener") @PathVariable Long id) {
+        Soporte soporte = service.obtenerPorId(id);
+        return assembler.toModel(soporte);
     }
 
     @Operation(summary = "Guardar un nuevo soporte", description = "Crea y guarda un nuevo soporte en el sistema")
@@ -35,11 +60,11 @@ public class SoporteController {
             @ApiResponse(responseCode = "201", description = "Soporte creado exitosamente"),
             @ApiResponse(responseCode = "400", description = "Datos invalidos para el soporte")
     })
-
     @PostMapping
     public Soporte guardar(@RequestBody Soporte soporte) {
         return service.guardar(soporte);
     }
+
 
     @Operation(summary = "Actualizar un soporte", description = "Actualiza un soporte existente por ID")
     @ApiResponses(value = {
