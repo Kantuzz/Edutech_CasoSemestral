@@ -16,7 +16,7 @@ public class SoporteModelAssembler implements RepresentationModelAssembler<Sopor
         return EntityModel.of(
                 soporte,
                 linkTo(methodOn(SoporteController.class).obtenerPorId(soporte.getId())).withSelfRel(),
-                linkTo(methodOn(SoporteController.class).listar()).withRel("soportes")
+                linkTo(methodOn(SoporteController.class).listarConLinks()).withRel("soportes")
         );
     }
 }

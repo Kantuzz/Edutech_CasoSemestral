@@ -16,7 +16,7 @@ public class EstudianteModelAssembler implements RepresentationModelAssembler<Es
         return EntityModel.of(
                 estudiante,
                 linkTo(methodOn(EstudianteController.class).obtenerPorId(estudiante.getId())).withSelfRel(),
-                linkTo(methodOn(EstudianteController.class).listar()).withRel("estudiantes")
+                linkTo(methodOn(EstudianteController.class).listarConLinks()).withRel("estudiantes")
         );
     }
 }

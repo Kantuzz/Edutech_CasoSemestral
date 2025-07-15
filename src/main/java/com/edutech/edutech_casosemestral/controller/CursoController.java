@@ -24,7 +24,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 public class CursoController {
 
     @Autowired
-    private CursoService service;
+    private CursoService cursoService;
 
     @Autowired
     private CursoModelAssembler assembler;
@@ -36,14 +36,14 @@ public class CursoController {
     })
     @GetMapping
     public List<Curso> listar() {
-        return service.listar();
+        return cursoService.listar();
     }
 
     @Operation(summary = "Listar cursos con enlaces HATEOAS")
     @ApiResponse(responseCode = "200", description = "Cursos con enlaces HATEOAS")
     @GetMapping("/hateoas")
     public CollectionModel<EntityModel<Curso>> listarConLinks() {
-        List<Curso> cursos = service.listar();
+        List<Curso> cursos = cursoService.listar();
 
         List<EntityModel<Curso>> cursoModels = cursos.stream()
                 .map(assembler::toModel)
@@ -60,7 +60,7 @@ public class CursoController {
     })
     @PostMapping
     public Curso guardar(@RequestBody Curso curso) {
-        return service.guardar(curso);
+        return cursoService.guardar(curso);
     }
 
     @Operation(summary = "Actualizar un curso existente")
@@ -68,11 +68,10 @@ public class CursoController {
             @ApiResponse(responseCode = "200", description = "Curso actualizado correctamente"),
             @ApiResponse(responseCode = "404", description = "Curso no encontrado")
     })
-    @PutMapping("/{id}")
-    public Curso actualizar(
-            @Parameter(description = "ID del curso a actualizar", required = true)
-            @PathVariable Long id, @RequestBody Curso curso) {
-        return service.actualizar(id, curso);
+    @GetMapping("/{id}")
+    public EntityModel<Curso> obtenerPorId(@PathVariable Long id) {
+        Curso curso = cursoService.obtenerPorId(id);
+        return assembler.toModel(curso);
     }
 
     @Operation(summary = "Eliminar un curso por ID")
@@ -84,7 +83,7 @@ public class CursoController {
     public void eliminar(
             @Parameter(description = "ID del curso a eliminar", required = true)
             @PathVariable Long id) {
-        service.eliminar(id);
+        cursoService.eliminar(id);
     }
 
     // Métodos utilizados internamente por el assembler
@@ -92,7 +91,7 @@ public class CursoController {
     @Operation(hidden = true)
     @GetMapping("/hateoas/{id}")
     public Curso getCursoById(@PathVariable Long id) {
-        return service.listar().stream()
+        return cursoService.listar().stream()
                 .filter(curso -> curso.getId().equals(id))
                 .findFirst()
                 .orElseThrow(); // Puedes reemplazar por tu excepción personalizada
@@ -101,6 +100,6 @@ public class CursoController {
     @Operation(hidden = true)
     @GetMapping("/hateoas/all")
     public List<Curso> getAllCursos() {
-        return service.listar();
+        return cursoService.listar();
     }
 }

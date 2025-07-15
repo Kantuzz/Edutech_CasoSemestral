@@ -23,23 +23,25 @@ import java.util.List;
 public class SoporteController {
 
     @Autowired
-    private SoporteService service;
+    private SoporteService soporteService;
 
     @Autowired
     private SoporteModelAssembler assembler;
 
-    @Operation(summary = "Listar todos los soportes", description = "Devuelve una lista de todos los soportes")
+    @Operation(summary = "Listar todos los tickets de soporte con enlaces HATEOAS", description = "Devuelve una lista de soportes con enlaces HATEOAS")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Listado obtenido correctamente")
+            @ApiResponse(responseCode = "200", description = "Listado de soportes obtenido correctamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno al obtener soportes")
     })
-    @GetMapping
-    public CollectionModel<EntityModel<Soporte>> listar() {
-        List<EntityModel<Soporte>> soportes = service.listar().stream()
+    @GetMapping("/hateoas")
+    public CollectionModel<EntityModel<Soporte>> listarConLinks() {
+        List<EntityModel<Soporte>> soportes = soporteService.listar().stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
+
         return CollectionModel.of(
                 soportes,
-                linkTo(methodOn(SoporteController.class).listar()).withSelfRel()
+                linkTo(methodOn(SoporteController.class).listarConLinks()).withSelfRel()
         );
     }
 
@@ -51,7 +53,7 @@ public class SoporteController {
     @GetMapping("/{id}")
     public EntityModel<Soporte> obtenerPorId(
             @Parameter(description = "ID del soporte a obtener") @PathVariable Long id) {
-        Soporte soporte = service.obtenerPorId(id);
+        Soporte soporte = soporteService.obtenerPorId(id);
         return assembler.toModel(soporte);
     }
 
@@ -62,7 +64,7 @@ public class SoporteController {
     })
     @PostMapping
     public Soporte guardar(@RequestBody Soporte soporte) {
-        return service.guardar(soporte);
+        return soporteService.guardar(soporte);
     }
 
 
@@ -77,7 +79,7 @@ public class SoporteController {
             @Parameter(description = "ID del soporte a actualizar")
             @PathVariable Long id,
             @RequestBody Soporte soporte) {
-        return service.actualizar(id, soporte);
+        return soporteService.actualizar(id, soporte);
     }
 
     @Operation(summary = "Eliminar un soporte", description = "Elimina un soporte por su ID")
@@ -90,6 +92,6 @@ public class SoporteController {
     public void eliminar(
             @Parameter(description = "ID del soporte a eliminar")
             @PathVariable Long id) {
-        service.eliminar(id);
+        soporteService.eliminar(id);
     }
 }

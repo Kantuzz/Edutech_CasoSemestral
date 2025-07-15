@@ -13,14 +13,10 @@ public class CursoModelAssembler implements RepresentationModelAssembler<Curso, 
 
     @Override
     public EntityModel<Curso> toModel(Curso curso) {
-        EntityModel<Curso> model = EntityModel.of(curso);
-
-        if (curso.getId() != null && curso.getId() > 0) {
-            model.add(linkTo(methodOn(CursoController.class).getCursoById(curso.getId())).withSelfRel());
-        }
-
-        model.add(linkTo(methodOn(CursoController.class).getAllCursos()).withRel("cursos"));
-
-        return model;
+        return EntityModel.of(
+                curso,
+                linkTo(methodOn(CursoController.class).obtenerPorId(curso.getId())).withSelfRel(),
+                linkTo(methodOn(CursoController.class).listarConLinks()).withRel("cursos")
+        );
     }
 }

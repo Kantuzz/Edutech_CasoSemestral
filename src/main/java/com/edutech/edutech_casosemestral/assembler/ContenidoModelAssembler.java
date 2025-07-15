@@ -16,7 +16,7 @@ public class ContenidoModelAssembler implements RepresentationModelAssembler<Con
         return EntityModel.of(
                 contenido,
                 linkTo(methodOn(ContenidoController.class).obtenerPorId(contenido.getId())).withSelfRel(),
-                linkTo(methodOn(ContenidoController.class).listar()).withRel("contenidos")
+                linkTo(methodOn(ContenidoController.class).listarConLinks()).withRel("contenidos")
         );
     }
 }

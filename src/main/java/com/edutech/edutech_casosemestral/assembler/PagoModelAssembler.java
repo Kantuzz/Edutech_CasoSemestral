@@ -16,7 +16,7 @@ public class PagoModelAssembler implements RepresentationModelAssembler<Pago, En
         return EntityModel.of(
                 pago,
                 linkTo(methodOn(PagoController.class).obtenerPorId(pago.getId())).withSelfRel(),
-                linkTo(methodOn(PagoController.class).listar()).withRel("pagos")
+                linkTo(methodOn(PagoController.class).listarConLinks()).withRel("pagos")
         );
     }
 }

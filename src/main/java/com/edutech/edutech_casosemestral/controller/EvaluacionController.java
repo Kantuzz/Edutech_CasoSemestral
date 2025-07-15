@@ -30,19 +30,20 @@ public class EvaluacionController {
     private EvaluacionModelAssembler assembler;
 
 
-    @Operation(summary = "Listar todas las evaluaciones")
+    @Operation(summary = "Listar todas las evaluaciones con enlaces HATEOAS", description = "Devuelve una lista de evaluaciones con enlaces HATEOAS")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Listado obtenido correctamente"),
+            @ApiResponse(responseCode = "200", description = "Listado de evaluaciones obtenido correctamente"),
             @ApiResponse(responseCode = "500", description = "Error interno al obtener evaluaciones")
     })
-    @GetMapping
-    public CollectionModel<EntityModel<Evaluacion>> listar() {
+    @GetMapping("/hateoas")
+    public CollectionModel<EntityModel<Evaluacion>> listarConLinks() {
         List<EntityModel<Evaluacion>> evaluaciones = evaluacionService.listar().stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
+
         return CollectionModel.of(
                 evaluaciones,
-                linkTo(methodOn(EvaluacionController.class).listar()).withSelfRel()
+                linkTo(methodOn(EvaluacionController.class).listarConLinks()).withSelfRel()
         );
     }
 

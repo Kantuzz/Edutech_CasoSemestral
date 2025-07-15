@@ -27,19 +27,19 @@ public class ContenidoController {
     @Autowired
     private ContenidoModelAssembler assembler;
 
-    @Operation(summary = "Listar todos los contenidos", description = "Retorna una lista de todos los contenidos disponibles")
+    @Operation(summary = "Listar todos los con enlaces HATEOAS", description = "Retorna una lista de todos los contenidos disponibles")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista retornada correctamente"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @GetMapping
-    public CollectionModel<EntityModel<Contenido>> listar() {
+    @GetMapping("/hateoas")
+    public CollectionModel<EntityModel<Contenido>> listarConLinks() {
         List<EntityModel<Contenido>> contenidos = service.listar().stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
         return CollectionModel.of(
                 contenidos,
-                linkTo(methodOn(ContenidoController.class).listar()).withSelfRel()
+                linkTo(methodOn(ContenidoController.class).listarConLinks()).withSelfRel()
         );
     }
 

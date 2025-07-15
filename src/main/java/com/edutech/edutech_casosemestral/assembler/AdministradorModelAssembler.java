@@ -16,7 +16,7 @@ public class AdministradorModelAssembler implements RepresentationModelAssembler
         return EntityModel.of(
                 admin,
                 linkTo(methodOn(AdministradorController.class).obtenerPorId(admin.getId())).withSelfRel(),
-                linkTo(methodOn(AdministradorController.class).listar()).withRel("administradores")
+                linkTo(methodOn(AdministradorController.class).listarConLinks()).withRel("administradores")
         );
     }
 }

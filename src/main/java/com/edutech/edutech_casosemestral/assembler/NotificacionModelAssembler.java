@@ -16,7 +16,7 @@ public class NotificacionModelAssembler implements RepresentationModelAssembler<
         return EntityModel.of(
                 notificacion,
                 linkTo(methodOn(NotificacionController.class).obtenerPorId(notificacion.getId())).withSelfRel(),
-                linkTo(methodOn(NotificacionController.class).listar()).withRel("notificaciones")
+                linkTo(methodOn(NotificacionController.class).listarConLinks()).withRel("notificaciones")
         );
     }
 }

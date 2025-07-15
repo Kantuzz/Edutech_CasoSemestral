@@ -30,18 +30,20 @@ public class PagoController {
     private PagoModelAssembler assembler;
 
 
-    @Operation(summary = "Listar todos los pagos", description = "Devuelve una lista de todos los pagos registrados con enlaces HATEOAS")
+    @Operation(summary = "Listar todos los pagos con enlaces HATEOAS", description = "Devuelve una lista de pagos con enlaces HATEOAS")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Listado obtenido correctamente")
+            @ApiResponse(responseCode = "200", description = "Listado de pagos obtenido correctamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno al obtener pagos")
     })
-    @GetMapping
-    public CollectionModel<EntityModel<Pago>> listar() {
+    @GetMapping("/hateoas")
+    public CollectionModel<EntityModel<Pago>> listarConLinks() {
         List<EntityModel<Pago>> pagos = pagoService.listar().stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
+
         return CollectionModel.of(
                 pagos,
-                linkTo(methodOn(PagoController.class).listar()).withSelfRel()
+                linkTo(methodOn(PagoController.class).listarConLinks()).withSelfRel()
         );
     }
 

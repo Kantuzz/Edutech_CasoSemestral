@@ -16,7 +16,7 @@ public class InstructorModelAssembler implements RepresentationModelAssembler<In
         return EntityModel.of(
                 instructor,
                 linkTo(methodOn(InstructorController.class).obtenerPorId(instructor.getId())).withSelfRel(),
-                linkTo(methodOn(InstructorController.class).listar()).withRel("instructores")
+                linkTo(methodOn(InstructorController.class).listarConLinks()).withRel("instructores")
         );
     }
 }

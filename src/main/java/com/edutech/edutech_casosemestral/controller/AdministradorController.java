@@ -30,19 +30,19 @@ public class AdministradorController {
     private AdministradorModelAssembler assembler;
 
 
-    @Operation(summary = "Listar todos los administradores")
+    @Operation(summary = "Listar todos los administradores con HATEOAS", description = "Devuelve una lista de administradores con enlaces HATEOAS")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Listado obtenido correctamente"),
             @ApiResponse(responseCode = "500", description = "Error interno al obtener administradores")
     })
-    @GetMapping
-    public CollectionModel<EntityModel<Administrador>> listar() {
+    @GetMapping("/hateoas")
+    public CollectionModel<EntityModel<Administrador>> listarConLinks() {
         List<EntityModel<Administrador>> administradores = service.listar().stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
         return CollectionModel.of(
                 administradores,
-                linkTo(methodOn(AdministradorController.class).listar()).withSelfRel()
+                linkTo(methodOn(AdministradorController.class).listarConLinks()).withSelfRel()
         );
     }
 

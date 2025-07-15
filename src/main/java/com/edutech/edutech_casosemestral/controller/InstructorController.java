@@ -24,24 +24,26 @@ import java.util.List;
 public class InstructorController {
 
     @Autowired
-    private InstructorService service;
+    private InstructorService instructorService;
 
     @Autowired
     private InstructorModelAssembler assembler;
 
 
-    @Operation(summary = "Listar todos los instructores", description = "Obtiene una lista con todos los instructores registrados")
+    @Operation(summary = "Listar todos los instructores con enlaces HATEOAS", description = "Devuelve una lista de instructores con enlaces HATEOAS")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista obtenida exitosamente")
+            @ApiResponse(responseCode = "200", description = "Listado de instructores obtenido correctamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno al obtener instructores")
     })
-    @GetMapping
-    public CollectionModel<EntityModel<Instructor>> listar() {
-        List<EntityModel<Instructor>> instructores = service.listar().stream()
+    @GetMapping("/hateoas")
+    public CollectionModel<EntityModel<Instructor>> listarConLinks() {
+        List<EntityModel<Instructor>> instructores = instructorService.listar().stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
+
         return CollectionModel.of(
                 instructores,
-                linkTo(methodOn(InstructorController.class).listar()).withSelfRel()
+                linkTo(methodOn(InstructorController.class).listarConLinks()).withSelfRel()
         );
     }
 
@@ -53,14 +55,14 @@ public class InstructorController {
     @GetMapping("/{id}")
     public EntityModel<Instructor> obtenerPorId(
             @Parameter(description = "ID del instructor a obtener") @PathVariable Long id) {
-        Instructor instructor = service.obtenerPorId(id);
+        Instructor instructor = instructorService.obtenerPorId(id);
         return assembler.toModel(instructor);
     }
 
 
     @PostMapping
     public Instructor guardar(@RequestBody Instructor instructor) {
-        return service.guardar(instructor);
+        return instructorService.guardar(instructor);
     }
 
     @Operation(summary = "Actualizar un instructor existente", description = "Actualiza los datos de un instructor por su ID")
@@ -74,7 +76,7 @@ public class InstructorController {
             @Parameter(description = "ID del instructor a actualizar")
             @PathVariable Long id,
             @RequestBody Instructor instructor) {
-        return service.actualizar(id, instructor);
+        return instructorService.actualizar(id, instructor);
     }
 
     @Operation(summary = "Eliminar un instructor", description = "Elimina un instructor por su ID")
@@ -87,6 +89,6 @@ public class InstructorController {
     public void eliminar(
             @Parameter(description = "ID del instructor a eliminar")
             @PathVariable Long id) {
-        service.eliminar(id);
+        instructorService.eliminar(id);
     }
 }

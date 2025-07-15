@@ -30,19 +30,20 @@ public class EstudianteController {
     private EstudianteModelAssembler assembler;
 
 
-    @Operation(summary = "Listar todos los Estudiantes")
+    @Operation(summary = "Listar todos los estudiantes con enlaces HATEOAS", description = "Devuelve una lista de estudiantes con enlaces HATEOAS")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Listado obtenido correctamente"),
-            @ApiResponse(responseCode = "500", description = "Error interno al obtener Estudiantes")
+            @ApiResponse(responseCode = "200", description = "Listado de estudiantes obtenido correctamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno al obtener estudiantes")
     })
-    @GetMapping
-    public CollectionModel<EntityModel<Estudiante>> listar() {
+    @GetMapping("/hateoas")
+    public CollectionModel<EntityModel<Estudiante>> listarConLinks() {
         List<EntityModel<Estudiante>> estudiantes = service.listar().stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
+
         return CollectionModel.of(
                 estudiantes,
-                linkTo(methodOn(EstudianteController.class).listar()).withSelfRel()
+                linkTo(methodOn(EstudianteController.class).listarConLinks()).withSelfRel()
         );
     }
 

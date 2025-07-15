@@ -16,7 +16,7 @@ public class EvaluacionModelAssembler implements RepresentationModelAssembler<Ev
         return EntityModel.of(
                 evaluacion,
                 linkTo(methodOn(EvaluacionController.class).obtenerPorId(evaluacion.getId())).withSelfRel(),
-                linkTo(methodOn(EvaluacionController.class).listar()).withRel("evaluaciones")
+                linkTo(methodOn(EvaluacionController.class).listarConLinks()).withRel("evaluaciones")
         );
     }
 }

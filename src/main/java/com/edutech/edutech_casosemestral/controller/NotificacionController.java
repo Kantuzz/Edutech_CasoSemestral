@@ -30,18 +30,20 @@ public class NotificacionController {
     private NotificacionModelAssembler assembler;
 
 
-    @Operation(summary = "Listar todas las notificaciones", description = "Devuelve una lista de todas las notificaciones registradas")
+    @Operation(summary = "Listar todas las notificaciones con enlaces HATEOAS", description = "Devuelve una lista de notificaciones con enlaces HATEOAS")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Listado obtenido exitosamente")
+            @ApiResponse(responseCode = "200", description = "Listado de notificaciones obtenido correctamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno al obtener notificaciones")
     })
-    @GetMapping
-    public CollectionModel<EntityModel<Notificacion>> listar() {
+    @GetMapping("/hateoas")
+    public CollectionModel<EntityModel<Notificacion>> listarConLinks() {
         List<EntityModel<Notificacion>> notificaciones = notificacionService.listar().stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
+
         return CollectionModel.of(
                 notificaciones,
-                linkTo(methodOn(NotificacionController.class).listar()).withSelfRel()
+                linkTo(methodOn(NotificacionController.class).listarConLinks()).withSelfRel()
         );
     }
 
